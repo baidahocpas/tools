@@ -1,0 +1,36 @@
+<div class="container" ng-if="!uploadFormSubmitted">
+  <form ng-submit="submitUpload()">
+    <div class="form-group">
+      <i class="fa fa-sm fa-asterisk text-danger"></i> <label for="studioName">Studio name: <b>{{ uploadFormData.studioName }}</b></label>
+      <div class="input-group">
+        <input name="studioName" type="text" class="form-control" ng-model="uploadFormData.studioName" required autofocus>
+        
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Choose a studio
+          </button>
+          
+          <div class="dropdown-menu dropdown-menu-right">
+            <a href="" class="dropdown-item" ng-repeat="studio in pbStudios" ng-click="assignStudioName(studio.name)">{{ studio.name }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <i class="fa fa-sm fa-asterisk text-danger"></i> <label for="inventoryFileUpload">Inventory list</label>
+      <input name="inventoryFileUpload" id="inputFile" type="file" class="form-control-file" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+</div>
+
+<div class="container" ng-if="uploadFormSubmitted">
+  <h2 class="text-center">{{ uploadSuccessCount }} / {{ uploadWorkbookRowCount }}</h2>
+  <div class="progress">
+    <div class="progress-bar bg-success" role="progressbar" style="width:{{ uploadProgress }}%;-webkit-transition:width 0.5s ease !important;-moz-transition:width 0.5s ease !important;-o-transition:width 0.5s ease !important;transition:width 0.5s ease !important;" aria-valuenow="{{ uploadProgress }}" aria-valuemin="0" aria-valuemax="100">{{ uploadProgress }}%</div>
+  </div>
+  <hr>
+  
+  <button type="button" class="btn btn-primary" ui-sref="purebarre" ng-disabled="uploadProgress != 100">Enter sales data</button>
+</div>

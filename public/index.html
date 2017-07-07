@@ -1,0 +1,50 @@
+<!doctype html>
+<html ng-app="baidahocpasToolsApp">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Tools | Bennett & Associates, CPAs</title>
+	
+  <!-- dependencies -->
+  <link rel="stylesheet" href="inc/lib/bs-cpas/dist/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="inc/custom.css">
+</head>
+<body>
+
+  <ui-view></ui-view>
+	
+  <!-- dependencies -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+  <script src="inc/lib/bs-cpas/dist/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.2/angular-ui-router.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.7.2/firebase.js"></script>
+  <script src="https://cdn.firebase.com/libs/angularfire/2.1.0/angularfire.min.js"></script>
+  
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyCO1cCdvslmOUI2-HARIIgLZmBXmX-qh6w",
+      authDomain: "j-cdn-30895.firebaseapp.com",
+      databaseURL: "https://j-cdn-30895.firebaseio.com",
+      storageBucket: "j-cdn-30895.appspot.com",
+      messagingSenderId: "525971176948"
+    };
+    firebase.initializeApp(config);
+  </script>
+	
+  <!-- baidahocpasToolsApp -->
+  <script src="inc/js/main.js"></script>
+  <script src="inc/js/auth.factory.js"></script>
+  <script src="pg/views/home/home.controller.js"></script>
+  <script src="pg/views/login/login.controller.js"></script>
+  <script src="pg/views/purebarre/purebarre.controller.js"></script>
+  <script src="pg/views/purebarre/settings/purebarre.settings.controller.js"></script>
+  
+  <!-- load after everything else -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.9.2/xlsx.core.min.js"></script>
+</body>
+</html>

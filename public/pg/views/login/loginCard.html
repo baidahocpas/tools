@@ -1,0 +1,9 @@
+<div class="container d-flex justify-content-center">
+  <form class="form-signin" style="min-width:300px" ng-submit="signIn()">
+    <label for="email" class="sr-only">Email</label>
+    <input type="email" id="email" ng-model="loginUser.email" class="form-control" placeholder="Email address" required autofocus>
+    <label for="password" class="sr-only">Password</label>
+    <input type="password" id="password" ng-model="loginUser.password" class="form-control" placeholder="Password" required>
+    <button class="btn btn-primary btn-block mt-2" type="submit" style="cursor:pointer" ng-disabled="loading"><span ng-if="!loading">Sign in</span><span ng-if="loading">Signing in...</span></button>
+  </form>
+</div>

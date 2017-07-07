@@ -1,0 +1,150 @@
+<div class="container" ng-if="!uploadFormSubmitted">
+  <form ng-submit="submitUpload()">
+    <div class="form-group">
+      <i class="fa fa-sm fa-asterisk text-danger"></i> <label for="studioName">Studio name: <b>{{ uploadFormData.studioName }}</b></label>
+      <br>
+      <select name="studioName" class="custom-select" ng-model="uploadFormData.studioName" required>
+        <option ng-repeat="studio in pbStudios" value="{{ studio.name }}">{{ studio.name }}</option>
+      </select>
+      <br>
+      <!--<div class="dropdown">
+        <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Choose a studio...
+        </button>
+        
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <a href="" class="dropdown-item" ng-repeat="studio in pbStudios" ng-click="setUploadStudioName(studio.name)">{{ studio.name }}</a>
+        </div>
+      </div>-->
+      
+      <a class="small" ui-sref="purebarre.settings">I don't see my studio...</a>
+    </div>
+    <div class="form-group">
+      <i class="fa fa-sm fa-asterisk text-danger"></i> <label for="inputFile">Sales report</label>
+      <input id="inputFile" type="file" class="form-control-file" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+</div>
+
+<div class="container" ng-if="uploadFormSubmitted">
+  <h2 class="text-center">{{ uploadSuccessCount }} / {{ uploadWorkbookRowCount }}</h2>
+  <div class="progress">
+    <div class="progress-bar bg-success" role="progressbar" style="width:{{ uploadProgress }}%;-webkit-transition:width 0.5s ease !important;-moz-transition:width 0.5s ease !important;-o-transition:width 0.5s ease !important;transition:width 0.5s ease !important;" aria-valuenow="{{ uploadProgress }}" aria-valuemin="0" aria-valuemax="100">{{ uploadProgress }}%</div>
+  </div>
+  <hr>
+  <h3>Analyze Data</h3>
+  <form>
+    <div class="form-group">
+      <div class="form-check">
+        <label class="form-check-label">
+          <input type="checkbox" class="form-check-input" ng-model="analyzePBDataSettings.separateByPaymentMethod" disabled>
+          Separate deposits by payment method (cash/credit)
+        </label>
+      </div>
+      <div class="form-check">
+        <label class="form-check-label">
+          <input type="checkbox" class="form-check-input" ng-model="analyzePBDataSettings.separateByLocation">
+          Separate deposits by location
+        </label>
+      </div>
+    </div>
+    <div class="form-group">
+      <button type="button" class="btn btn-primary" ng-disabled="uploadProgress != 100" ng-click="analyzePBData()">Analyze</button>
+    </div>
+  </form>
+  
+  <div ng-repeat="sale in pbData">
+    <h4>{{ sale.Date }}</h4>
+    
+    <!-- Separate by payment method -->
+    <div ng-if="analyzePBDataSettingsPersist.separateByPaymentMethod">
+      <!-- Separate by location -->
+      <div ng-if="analyzePBDataSettingsPersist.separateByLocation">
+        <div class="pl-2" ng-if="sale['Cash Sales'] != null">
+          <h5>Cash Sales</h5>
+          <!-- Iterate through locations -->
+          <div class="pl-3" ng-repeat="location in sale['Cash Sales']">
+            <h6><b>{{ location.Location }}</b></h6>
+            <p>
+              <span ng-repeat="(key, value) in location">
+                <span ng-if="key != 'Location' && key != 'Tax' && key != 'Total Deposit'">
+                  {{ key }}: {{ value }}<br>
+                </span>
+              </span>
+              <span ng-repeat="(key, value) in location">
+                <span ng-if="key == 'Tax'">{{ key }}: {{ value }}</span>
+              </span><br>
+              <span ng-repeat="(key, value) in location">
+                <span ng-if="key == 'Total Deposit'"><b>{{ key }}: {{ value }}</b></span>
+              </span>
+            </p>
+          </div>
+        </div>
+        
+        <div class="pl-2" ng-if="sale['Credit Sales'] != null">
+          <h5>Credit Sales</h5>
+          <!-- Iterate through locations -->
+          <div class="pl-3" ng-repeat="location in sale['Credit Sales']">
+            <h6><b>{{ location.Location }}</b></h6>
+            <p>
+              <span ng-repeat="(key, value) in location">
+                <span ng-if="key != 'Location' && key != 'Tax' && key != 'Total Deposit'">
+                  {{ key }}: {{ value }}<br>
+                </span>
+              </span>
+              <span ng-repeat="(key, value) in location">
+                <span ng-if="key == 'Tax'">{{ key }}: {{ value }}</span>
+              </span><br>
+              <span ng-repeat="(key, value) in location">
+                <span ng-if="key == 'Total Deposit'"><b>{{ key }}: {{ value }}</b></span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- !Separate by location -->
+      
+      <!-- Don't separate by location -->
+      <div ng-if="!analyzePBDataSettingsPersist.separateByLocation">
+        <div class="pl-2" ng-if="sale['Cash Sales'] != null">
+          <h5>Cash Sales</h5>
+          <p>
+            <span ng-repeat="(key, value) in sale['Cash Sales']">
+              <span ng-if="key != 'Tax' && key != 'Total Deposit'">
+                {{ key }}: {{ value }}<br>
+              </span>
+            </span>
+            <span ng-repeat="(key, value) in sale['Cash Sales']">
+              <span ng-if="key == 'Tax'">{{ key }}: {{ value }}</span>
+            </span><br>
+            <span ng-repeat="(key, value) in sale['Cash Sales']">
+              <span ng-if="key == 'Total Deposit'"><b>{{ key }}: {{ value }}</b></span>
+            </span>
+          </p>
+        </div>
+        
+        <div class="pl-2" ng-if="sale['Credit Sales'] != null">
+          <h5>Credit Sales</h5>
+          <p>
+            <span ng-repeat="(key, value) in sale['Credit Sales']">
+              <span ng-if="key != 'Tax' && key != 'Total Deposit'">
+                {{ key }}: {{ value }}<br>
+              </span>
+            </span>
+            <span ng-repeat="(key, value) in sale['Credit Sales']">
+              <span ng-if="key == 'Tax'">{{ key }}: {{ value }}</span>
+            </span><br>
+            <span ng-repeat="(key, value) in sale['Credit Sales']">
+              <span ng-if="key == 'Total Deposit'"><b>{{ key }}: {{ value }}</b></span>
+            </span>
+          </p>
+        </div>
+      </div>
+      <!-- !Don't separate by location -->
+    </div>
+    <!-- !Separate by payment method -->
+    
+    <hr>
+  </div>
+</div>

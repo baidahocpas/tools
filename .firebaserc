@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "staging": "j-cdn-30895",
+    "default": "j-cdn-30895"
+  }
+}

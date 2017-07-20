@@ -129,6 +129,7 @@ function ($firebaseArray, $scope, $state, Auth, NAV_LINKS) {
   const outGiftCard = 'Gift Card';
   const outTax = 'Tax';
   const outTotal = 'Total Deposit';
+  const outNoAuth = 'No auth';
   
   const foodProductsList = [
     'water',
@@ -482,95 +483,102 @@ function ($firebaseArray, $scope, $state, Auth, NAV_LINKS) {
                  pbData[saleDate][outCreditSales][saleLocation]['Location'] = saleLocation;
               }
               
+              let isNoAuth = false;
               let isLateFee = false;
               let isProduct = false;
               let isFoodProduct = false;
               let isGiftCard = false;
               
-              if (new RegExp(lateFeeList.join("|")).test(childData[pbItemName].toLowerCase())) isLateFee = true;
-              else if (new RegExp(giftCardsList.join("|")).test(childData[pbItemName].toLowerCase())) isGiftCard = true;
-              else if (inventoryData.includes(childData[pbItemName])) isProduct = true;
-              else if (new RegExp(foodProductsList.join("|")).test(childData[pbItemName].toLowerCase())) isFoodProduct = true;
-              
-              // If tax hasn't been recorded yet, make new property for tax
-              if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outTax)) pbData[saleDate][outCreditSales][saleLocation][outTax] = 0.0;
-              pbData[saleDate][outCreditSales][saleLocation][outTax] += saleTax.round(2);
-              
-              // If total hasn't been recorded yet, make new property for total
-              if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outTotal)) pbData[saleDate][outCreditSales][saleLocation][outTotal] = 0.0;
-              pbData[saleDate][outCreditSales][saleLocation][outTotal] += saleTotalPaidWPaymentMethod;
-              
-              if (isProduct) {
-                if (saleGross != 0) {
-                  // If product hasn't been recorded yet, record new product
-                  if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outProduct)) {
-                    pbData[saleDate][outCreditSales][saleLocation][outProduct] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][saleLocation][outProduct] += saleGross;
-                }
-                
-                if (childData[pbDiscountAmount] != 0) {
-                  // If product discount hasn't been recorded yet, record new product discount
-                  if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outProductDiscount)) {
-                    pbData[saleDate][outCreditSales][saleLocation][outProductDiscount] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][saleLocation][outProductDiscount] -= saleDiscountAmount;
-                }
-              } else if (isFoodProduct) {
-                if (saleGross != 0) {
-                  // If food product hasn't been recorded yet, record new food product
-                  if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outFoodProduct)) {
-                    pbData[saleDate][outCreditSales][saleLocation][outFoodProduct] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][saleLocation][outFoodProduct] += saleGross;
-                }
-                
-                // if (inventoryData.includes(childData[pbItemName])) {
-                //   // If food product tax hasn't been recorded yet, record new food product tax
-                //   if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outFoodProductTax)) {
-                //     pbData[saleDate][outCreditSales][saleLocation][outFoodProductTax] = 0.0;
-                //   }
-                //   pbData[saleDate][outCreditSales][saleLocation][outFoodProductTax] += saleTax;
-                // }
-              } else if (isLateFee) {
-                if (saleGross != 0) {
-                  // If late fee hasn't been recorded yet, record new late fee
-                  if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outLateFee)) {
-                    pbData[saleDate][outCreditSales][saleLocation][outLateFee] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][saleLocation][outLateFee] += saleGross;
-                }
-              } else if (isGiftCard) {
-                if (saleGross != 0) {
-                  // If product hasn't been recorded yet, record new product
-                  if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outGiftCard)) {
-                    pbData[saleDate][outCreditSales][saleLocation][outGiftCard] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][saleLocation][outGiftCard] += saleGross;
-                }
+              // If payment method includes "no auth" create a separate entry on that date for no auth
+              if (new RegExp('no auth').test(salePaymentMethod.toLowerCase())) {
+                isNoAuth = true;
+                pbData[saleDate][outCreditSales][saleLocation][outNoAuth] += saleTotalPaidWPaymentMethod;
               } else {
-                // Class sales
-                if (saleGross != 0) {
-                  // If class hasn't been recorded yet, record new class
-                  if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outClass)) {
-                    pbData[saleDate][outCreditSales][saleLocation][outClass] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][saleLocation][outClass] += saleGross;
-                }
+                if (new RegExp(lateFeeList.join("|")).test(childData[pbItemName].toLowerCase())) isLateFee = true;
+                else if (new RegExp(giftCardsList.join("|")).test(childData[pbItemName].toLowerCase())) isGiftCard = true;
+                else if (inventoryData.includes(childData[pbItemName])) isProduct = true;
+                else if (new RegExp(foodProductsList.join("|")).test(childData[pbItemName].toLowerCase())) isFoodProduct = true;
                 
-                if (childData[pbDiscountAmount] != 0) {
-                  // If class discount hasn't been recorded yet, record new class discount
-                  if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outClassDiscount)) {
-                    pbData[saleDate][outCreditSales][saleLocation][outClassDiscount] = 0.0;
+                // If tax hasn't been recorded yet, make new property for tax
+                if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outTax)) pbData[saleDate][outCreditSales][saleLocation][outTax] = 0.0;
+                pbData[saleDate][outCreditSales][saleLocation][outTax] += saleTax.round(2);
+                
+                // If total hasn't been recorded yet, make new property for total
+                if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outTotal)) pbData[saleDate][outCreditSales][saleLocation][outTotal] = 0.0;
+                pbData[saleDate][outCreditSales][saleLocation][outTotal] += saleTotalPaidWPaymentMethod;
+                
+                if (isProduct) {
+                  if (saleGross != 0) {
+                    // If product hasn't been recorded yet, record new product
+                    if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outProduct)) {
+                      pbData[saleDate][outCreditSales][saleLocation][outProduct] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][saleLocation][outProduct] += saleGross;
                   }
                   
-                  pbData[saleDate][outCreditSales][saleLocation][outClassDiscount] -= saleDiscountAmount;
+                  if (childData[pbDiscountAmount] != 0) {
+                    // If product discount hasn't been recorded yet, record new product discount
+                    if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outProductDiscount)) {
+                      pbData[saleDate][outCreditSales][saleLocation][outProductDiscount] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][saleLocation][outProductDiscount] -= saleDiscountAmount;
+                  }
+                } else if (isFoodProduct) {
+                  if (saleGross != 0) {
+                    // If food product hasn't been recorded yet, record new food product
+                    if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outFoodProduct)) {
+                      pbData[saleDate][outCreditSales][saleLocation][outFoodProduct] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][saleLocation][outFoodProduct] += saleGross;
+                  }
+                  
+                  // if (inventoryData.includes(childData[pbItemName])) {
+                  //   // If food product tax hasn't been recorded yet, record new food product tax
+                  //   if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outFoodProductTax)) {
+                  //     pbData[saleDate][outCreditSales][saleLocation][outFoodProductTax] = 0.0;
+                  //   }
+                  //   pbData[saleDate][outCreditSales][saleLocation][outFoodProductTax] += saleTax;
+                  // }
+                } else if (isLateFee) {
+                  if (saleGross != 0) {
+                    // If late fee hasn't been recorded yet, record new late fee
+                    if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outLateFee)) {
+                      pbData[saleDate][outCreditSales][saleLocation][outLateFee] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][saleLocation][outLateFee] += saleGross;
+                  }
+                } else if (isGiftCard) {
+                  if (saleGross != 0) {
+                    // If product hasn't been recorded yet, record new product
+                    if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outGiftCard)) {
+                      pbData[saleDate][outCreditSales][saleLocation][outGiftCard] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][saleLocation][outGiftCard] += saleGross;
+                  }
+                } else {
+                  // Class sales
+                  if (saleGross != 0) {
+                    // If class hasn't been recorded yet, record new class
+                    if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outClass)) {
+                      pbData[saleDate][outCreditSales][saleLocation][outClass] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][saleLocation][outClass] += saleGross;
+                  }
+                  
+                  if (childData[pbDiscountAmount] != 0) {
+                    // If class discount hasn't been recorded yet, record new class discount
+                    if (!pbData[saleDate][outCreditSales][saleLocation].hasOwnProperty(outClassDiscount)) {
+                      pbData[saleDate][outCreditSales][saleLocation][outClassDiscount] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][saleLocation][outClassDiscount] -= saleDiscountAmount;
+                  }
                 }
               }
             }
@@ -695,97 +703,106 @@ function ($firebaseArray, $scope, $state, Auth, NAV_LINKS) {
                 pbData[saleDate][outCreditSales] = {};
               }
               
+              let isNoAuth = false;
               let isLateFee = false;
               let isProduct = false;
               let isFoodProduct = false;
               let isGiftCard = false;
               
-              if (new RegExp(lateFeeList.join("|")).test(childData[pbItemName].toLowerCase())) isLateFee = true;
-              else if (new RegExp(giftCardsList.join("|")).test(childData[pbItemName].toLowerCase())) isGiftCard = true;
-              else if (inventoryData.includes(childData[pbItemName])) isProduct = true;
-              else if (new RegExp(foodProductsList.join("|")).test(childData[pbItemName].toLowerCase())) isFoodProduct = true;
-              
-              // If tax hasn't been recorded yet, make new property for tax
-              if (!pbData[saleDate][outCreditSales].hasOwnProperty(outTax)) pbData[saleDate][outCreditSales][outTax] = 0.0;
-              pbData[saleDate][outCreditSales][outTax] += saleTax;
-              
-              // If total hasn't been recorded yet, make new property for total
-              if (!pbData[saleDate][outCreditSales].hasOwnProperty(outTotal)) pbData[saleDate][outCreditSales][outTotal] = 0.0;
-              pbData[saleDate][outCreditSales][outTotal] += saleTotalPaidWPaymentMethod;
-              
-              if (isProduct) {
-                if (saleGross != 0) {
-                  // If product hasn't been recorded yet, record new product
-                  if (!pbData[saleDate][outCreditSales].hasOwnProperty(outProduct)) {
-                    pbData[saleDate][outCreditSales][outProduct] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][outProduct] += saleGross;
-                }
-                
-                if (childData[pbDiscountAmount] != 0) {
-                  // If product discount hasn't been recorded yet, record new product discount
-                  if (!pbData[saleDate][outCreditSales].hasOwnProperty(outProductDiscount)) {
-                    pbData[saleDate][outCreditSales][outProductDiscount] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][outProductDiscount] -= saleDiscountAmount;
-                }
-              } else if (isFoodProduct) {
-                if (saleGross != 0) {
-                  // If food product hasn't been recorded yet, record new food product
-                  if (!pbData[saleDate][outCreditSales].hasOwnProperty(outFoodProduct)) {
-                    pbData[saleDate][outCreditSales][outFoodProduct] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][outFoodProduct] += saleGross;
-                }
-                
-                // if (inventoryData.includes(childData[pbItemName])) {
-                //   // If food product tax hasn't been recorded yet, record new food product tax
-                //   if (!pbData[saleDate][outCreditSales].hasOwnProperty(outFoodProductTax)) {
-                //     pbData[saleDate][outCreditSales][outFoodProductTax] = 0.0;
-                //   }
-                //   pbData[saleDate][outCreditSales][outFoodProductTax] += saleTax;
-                // }
-              } else if (isLateFee) {
-                if (saleGross != 0) {
-                  // If late fee hasn't been recorded yet, record new late fee
-                  if (!pbData[saleDate][outCreditSales].hasOwnProperty(outLateFee)) {
-                    pbData[saleDate][outCreditSales][outLateFee] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][outLateFee] += saleGross;
-                }
-              } else if (isGiftCard) {
-                if (saleGross != 0) {
-                  // If product hasn't been recorded yet, record new product
-                  if (!pbData[saleDate][outCreditSales].hasOwnProperty(outGiftCard)) {
-                    pbData[saleDate][outCreditSales][outGiftCard] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][outGiftCard] += saleGross;
-                }
+              // If payment method includes "no auth" create a separate entry on that date for no auth
+              if (new RegExp('no auth').test(salePaymentMethod.toLowerCase())) {
+                isNoAuth = true;
+                // pbData[saleDate][outCreditSales][saleLocation][outNoAuth] += saleTotalPaidWPaymentMethod;
               } else {
-                // Class sales
-                if (saleGross != 0) {
-                  // If class hasn't been recorded yet, record new class
-                  if (!pbData[saleDate][outCreditSales].hasOwnProperty(outClass)) {
-                    pbData[saleDate][outCreditSales][outClass] = 0.0;
-                  }
-                  
-                  pbData[saleDate][outCreditSales][outClass] += saleGross;
-                }
                 
-                if (childData[pbDiscountAmount] != 0) {
-                  // If class discount hasn't been recorded yet, record new class discount
-                  if (!pbData[saleDate][outCreditSales].hasOwnProperty(outClassDiscount)) {
-                    pbData[saleDate][outCreditSales][outClassDiscount] = 0.0;
+                if (new RegExp(lateFeeList.join("|")).test(childData[pbItemName].toLowerCase())) isLateFee = true;
+                else if (new RegExp(giftCardsList.join("|")).test(childData[pbItemName].toLowerCase())) isGiftCard = true;
+                else if (inventoryData.includes(childData[pbItemName])) isProduct = true;
+                else if (new RegExp(foodProductsList.join("|")).test(childData[pbItemName].toLowerCase())) isFoodProduct = true;
+                
+                // If tax hasn't been recorded yet, make new property for tax
+                if (!pbData[saleDate][outCreditSales].hasOwnProperty(outTax)) pbData[saleDate][outCreditSales][outTax] = 0.0;
+                pbData[saleDate][outCreditSales][outTax] += saleTax;
+                
+                // If total hasn't been recorded yet, make new property for total
+                if (!pbData[saleDate][outCreditSales].hasOwnProperty(outTotal)) pbData[saleDate][outCreditSales][outTotal] = 0.0;
+                pbData[saleDate][outCreditSales][outTotal] += saleTotalPaidWPaymentMethod;
+                
+                if (isProduct) {
+                  if (saleGross != 0) {
+                    // If product hasn't been recorded yet, record new product
+                    if (!pbData[saleDate][outCreditSales].hasOwnProperty(outProduct)) {
+                      pbData[saleDate][outCreditSales][outProduct] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][outProduct] += saleGross;
                   }
                   
-                  pbData[saleDate][outCreditSales][outClassDiscount] -= saleDiscountAmount;
+                  if (childData[pbDiscountAmount] != 0) {
+                    // If product discount hasn't been recorded yet, record new product discount
+                    if (!pbData[saleDate][outCreditSales].hasOwnProperty(outProductDiscount)) {
+                      pbData[saleDate][outCreditSales][outProductDiscount] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][outProductDiscount] -= saleDiscountAmount;
+                  }
+                } else if (isFoodProduct) {
+                  if (saleGross != 0) {
+                    // If food product hasn't been recorded yet, record new food product
+                    if (!pbData[saleDate][outCreditSales].hasOwnProperty(outFoodProduct)) {
+                      pbData[saleDate][outCreditSales][outFoodProduct] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][outFoodProduct] += saleGross;
+                  }
+                  
+                  // if (inventoryData.includes(childData[pbItemName])) {
+                  //   // If food product tax hasn't been recorded yet, record new food product tax
+                  //   if (!pbData[saleDate][outCreditSales].hasOwnProperty(outFoodProductTax)) {
+                  //     pbData[saleDate][outCreditSales][outFoodProductTax] = 0.0;
+                  //   }
+                  //   pbData[saleDate][outCreditSales][outFoodProductTax] += saleTax;
+                  // }
+                } else if (isLateFee) {
+                  if (saleGross != 0) {
+                    // If late fee hasn't been recorded yet, record new late fee
+                    if (!pbData[saleDate][outCreditSales].hasOwnProperty(outLateFee)) {
+                      pbData[saleDate][outCreditSales][outLateFee] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][outLateFee] += saleGross;
+                  }
+                } else if (isGiftCard) {
+                  if (saleGross != 0) {
+                    // If product hasn't been recorded yet, record new product
+                    if (!pbData[saleDate][outCreditSales].hasOwnProperty(outGiftCard)) {
+                      pbData[saleDate][outCreditSales][outGiftCard] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][outGiftCard] += saleGross;
+                  }
+                } else {
+                  // Class sales
+                  if (saleGross != 0) {
+                    // If class hasn't been recorded yet, record new class
+                    if (!pbData[saleDate][outCreditSales].hasOwnProperty(outClass)) {
+                      pbData[saleDate][outCreditSales][outClass] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][outClass] += saleGross;
+                  }
+                  
+                  if (childData[pbDiscountAmount] != 0) {
+                    // If class discount hasn't been recorded yet, record new class discount
+                    if (!pbData[saleDate][outCreditSales].hasOwnProperty(outClassDiscount)) {
+                      pbData[saleDate][outCreditSales][outClassDiscount] = 0.0;
+                    }
+                    
+                    pbData[saleDate][outCreditSales][outClassDiscount] -= saleDiscountAmount;
+                  }
                 }
               }
+              
             }
           }
         } else {

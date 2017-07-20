@@ -68,7 +68,7 @@
             <h6><b>{{ location.Location }}</b></h6>
             <p>
               <span ng-repeat="(key, value) in location">
-                <span ng-if="key != 'Location' && key != 'Tax' && key != 'Total Deposit'">
+                <span ng-if="key != 'Location' && key != 'Tax' && key != 'Total Deposit' && key != 'No auth'">
                   {{ key }}: {{ value }}<br>
                 </span>
               </span>
@@ -87,9 +87,9 @@
           <!-- Iterate through locations -->
           <div class="pl-3" ng-repeat="location in sale['Credit Sales']">
             <h6><b>{{ location.Location }}</b></h6>
-            <p>
+            <p class="pl-3">
               <span ng-repeat="(key, value) in location">
-                <span ng-if="key != 'Location' && key != 'Tax' && key != 'Total Deposit'">
+                <span ng-if="key != 'Location' && key != 'Tax' && key != 'Total Deposit' && key != 'No auth'">
                   {{ key }}: {{ value }}<br>
                 </span>
               </span>
@@ -98,7 +98,10 @@
               </span><br>
               <span ng-repeat="(key, value) in location">
                 <span ng-if="key == 'Total Deposit'"><b>{{ key }}: {{ value }}</b></span>
-              </span>
+              </span><br>
+              <!--<span ng-repeat="(key, value) in location">-->
+              <!--  <span ng-if="key == 'No auth'">{{ key }}: {{ value }}</span>-->
+              <!--</span>-->
             </p>
           </div>
         </div>
@@ -109,9 +112,9 @@
       <div ng-if="!analyzePBDataSettingsPersist.separateByLocation">
         <div class="pl-2" ng-if="sale['Cash Sales'] != null">
           <h5>Cash Sales</h5>
-          <p>
+          <p class="pl-3">
             <span ng-repeat="(key, value) in sale['Cash Sales']">
-              <span ng-if="key != 'Tax' && key != 'Total Deposit'">
+              <span ng-if="key != 'Tax' && key != 'Total Deposit' && key != 'No auth'">
                 {{ key }}: {{ value }}<br>
               </span>
             </span>
@@ -126,9 +129,9 @@
         
         <div class="pl-2" ng-if="sale['Credit Sales'] != null">
           <h5>Credit Sales</h5>
-          <p>
+          <p class="pl-3">
             <span ng-repeat="(key, value) in sale['Credit Sales']">
-              <span ng-if="key != 'Tax' && key != 'Total Deposit'">
+              <span ng-if="key != 'Tax' && key != 'Total Deposit' && key != 'No auth'">
                 {{ key }}: {{ value }}<br>
               </span>
             </span>
@@ -137,7 +140,10 @@
             </span><br>
             <span ng-repeat="(key, value) in sale['Credit Sales']">
               <span ng-if="key == 'Total Deposit'"><b>{{ key }}: {{ value }}</b></span>
-            </span>
+            </span><br>
+            <!--<span ng-repeat="(key, value) in sale['Credit Sales']">-->
+            <!--  <span ng-if="key == 'No auth'">{{ key }}: {{ value }}</span>-->
+            <!--</span>-->
           </p>
         </div>
       </div>
